@@ -82,6 +82,9 @@ results_protein_interactions_table <- ldply(results_protein_interactions, data.t
 pastefile1 <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.txt")
 write.table(results_protein_interactions_table, file=pastefile1, quote=F, row.names=F, sep="\t") 
 
+pastefile1b <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.rdata")
+save(results_protein_interactions_table, file=pastefile1b)
+
 
 ########################
 #### COLOCALISATION ####
@@ -145,32 +148,36 @@ results_coloc_tester <- mapply(extract_from_VCF, new_table2$protein_number, new_
 
 results_coloc_tester_table <- data.table(t(results_coloc_tester))
 
+head(results_coloc_tester)
 
-results_coloc_tester_table <- apply(results_coloc_tester_table,2,as.character)
+head(results_coloc_tester_table)
 
-pastefile_test <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results_tester.csv")
+
+#results_coloc_tester_table <- apply(results_coloc_tester_table,2,as.character)
+
+#pastefile_test <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results_tester.csv")
 pastefile_test2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results_tester.rdata")
 
 save(results_coloc_tester_table, file=pastefile_test2)
 
-write.csv (results_coloc_tester_table, file=pastefile_test, quote=F, row.names=F)
+#write.csv (results_coloc_tester_table, file=pastefile_test, quote=F, row.names=F)
 
 
 ####
 
 
-results_for_coloc_full <- mapply(extract_from_VCF, new_table$protein_number, new_table$Platform_id, new_table$CHR_SNP, new_table$POS_SNP)
+#results_for_coloc_full <- mapply(extract_from_VCF, new_table$protein_number, new_table$Platform_id, new_table$CHR_SNP, new_table$POS_SNP)#
 
-results_for_coloc_full_table <- data.table(t(results_for_coloc_full))
+#results_for_coloc_full_table <- data.table(t(results_for_coloc_full))#
 
-results_for_coloc_full_table <- apply(results_for_coloc_full_table,2,as.character)
+#results_for_coloc_full_table <- apply(results_for_coloc_full_table,2,as.character)#
 
-pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
-write.csv (results_for_coloc_full_table, file=pastefile2, quote=F, row.names=F)
+#pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
+#write.csv (results_for_coloc_full_table, file=pastefile2, quote=F, row.names=F)#
+#
 
-
-pastefile3 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
-save(results_for_coloc_full_table, file=pastefile3)
+#pastefile3 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
+#save(results_for_coloc_full_table, file=pastefile3)
 
 
 

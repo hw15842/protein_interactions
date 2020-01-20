@@ -73,7 +73,6 @@ run_protein_MR <- function(exposure_protein){
 }
 
 
-
 results_protein_interactions <- lapply(zheng_pQTLs_individual_proteins, run_protein_MR)
 results_protein_interactions_table <- ldply(results_protein_interactions, data.table)
 

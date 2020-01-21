@@ -131,7 +131,7 @@ extract_from_VCF <- function(exposure_protein_number, exposure_protein_name, chr
 results_for_coloc_full <- mapply(extract_from_VCF, new_table$protein_number, new_table$Platform_id, new_table$CHR_SNP, new_table$POS_SNP)
 results_for_coloc_full_table <- data.table(t(results_for_coloc_full))
 
-pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
+pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.rdata")
 save(results_for_coloc_full_table, file=pastefile2)
 
 

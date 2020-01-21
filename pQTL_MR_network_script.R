@@ -73,16 +73,13 @@ run_protein_MR <- function(exposure_protein){
 }
 
 
-results_protein_interactions <- lapply(zheng_pQTLs_individual_proteins, run_protein_MR)
-results_protein_interactions_table <- ldply(results_protein_interactions, data.table)
+results_protein_interactions_MR <- lapply(zheng_pQTLs_individual_proteins, run_protein_MR)
+results_protein_interactions_MR_table <- ldply(results_protein_interactions_MR, data.table)
 
 ### Save the results - saving list and table format, 
 
-pastefile1 <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.txt")
-write.table(results_protein_interactions_table, file=pastefile1, quote=F, row.names=F, sep="\t") 
-
-pastefile1b <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.rdata")
-save(results_protein_interactions_table, file=pastefile1b)
+pastefile1 <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.rdata")
+save(results_protein_interactions_MR_table, file=pastefile1)
 
 
 ########################
@@ -130,53 +127,12 @@ extract_from_VCF <- function(exposure_protein_number, exposure_protein_name, chr
   return(coloc_results)
 }
 
-#a<- extract_from_VCF("prot-a-15","ACBD7",19, 54327869)
-#a#
 
-#b<- extract_from_VCF("prot-a-19", "ACP2", 14, 94844947)
-#b#
+results_for_coloc_full <- mapply(extract_from_VCF, new_table$protein_number, new_table$Platform_id, new_table$CHR_SNP, new_table$POS_SNP)
+results_for_coloc_full_table <- data.table(t(results_for_coloc_full))
 
-#x<- tryCatch(extract_from_VCF("prot-a-18","ACP1",2,272203), error=function(e) NULL)
-#x
-
-## tester ## 
-
-new_table2 <- new_table[c(1:100),]
-
-results_coloc_tester <- mapply(extract_from_VCF, new_table2$protein_number, new_table2$Platform_id, new_table2$CHR_SNP, new_table2$POS_SNP)
-
-results_coloc_tester_table <- data.table(t(results_coloc_tester))
-
-head(results_coloc_tester)
-
-head(results_coloc_tester_table)
-
-
-#results_coloc_tester_table <- apply(results_coloc_tester_table,2,as.character)
-
-#pastefile_test <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results_tester.csv")
-pastefile_test2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results_tester.rdata")
-
-save(results_coloc_tester_table, file=pastefile_test2)
-
-#write.csv (results_coloc_tester_table, file=pastefile_test, quote=F, row.names=F)
-
-
-####
-
-
-#results_for_coloc_full <- mapply(extract_from_VCF, new_table$protein_number, new_table$Platform_id, new_table$CHR_SNP, new_table$POS_SNP)#
-
-#results_for_coloc_full_table <- data.table(t(results_for_coloc_full))#
-
-#results_for_coloc_full_table <- apply(results_for_coloc_full_table,2,as.character)#
-
-#pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
-#write.csv (results_for_coloc_full_table, file=pastefile2, quote=F, row.names=F)#
-#
-
-#pastefile3 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
-#save(results_for_coloc_full_table, file=pastefile3)
+pastefile2 <- paste0(results_location, "/prot-a-", outcome_protein, "_coloc_results.csv")
+save(results_for_coloc_full_table, file=pastefile2)
 
 
 

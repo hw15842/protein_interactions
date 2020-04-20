@@ -50,6 +50,8 @@ snps_to_extract <- paste(zheng_pQTLS_formated$chr.exposure, zheng_pQTLS_formated
 
 outcome_protein <- unlist(regmatches(outcome_protein, gregexpr('\\(?[0-9,.]+', outcome_protein))) ### This stops it pasting the full "--outcome_protein=1" and just keeps the "1" (or what ever number the array job is)
 
+outcome_protein <- as.numeric(outcome_protein)+2000   ### This is beacuse cant submit above 2000 array so have to use 1-20000 in array .sh file 
+
 pastename1_outcome_protein_location <- paste0(outcome_data_location, "prot-a-", outcome_protein, "/", "prot-a-", outcome_protein, ".vcf.gz") # this is becuase need to go into the protein file and then get the vcf file 
 paste(pastename1_outcome_protein_location)
 outcome_protein_subset <- query_gwas(pastename1_outcome_protein_location, chrompos=snps_to_extract)

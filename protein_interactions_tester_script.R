@@ -111,7 +111,7 @@ set_bcftools()
 
 snps_to_extract <- paste(zheng_pQTLS_formated$chr.exposure, zheng_pQTLS_formated$pos.exposure, sep=":")
 
-prot_a_1_subset_extraction <- query_gwas("prot-a-1/prot-a-1.vcf.gz", chrompos=snps_to_extract)
+prot_a_1_subset_extraction <- query_gwas("/Users/hw15842/Documents/PhD_work/protein_interactions/prot-a-1/prot-a-1.vcf.gz", chrompos=snps_to_extract)
 prot_a_1_subset_extraction2 <- gwasvcf_to_TwoSampleMR(prot_a_1_subset_extraction, type="outcome")
 
 ## Run the MR for each exposure protein on the outcome protein

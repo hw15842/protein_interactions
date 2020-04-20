@@ -73,13 +73,13 @@ run_protein_MR <- function(exposure_protein){
 }
 
 
-#results_protein_interactions_MR <- lapply(zheng_pQTLs_individual_proteins, run_protein_MR)
-#results_protein_interactions_MR_table <- ldply(results_protein_interactions_MR, data.table)
+results_protein_interactions_MR <- lapply(zheng_pQTLs_individual_proteins, run_protein_MR)
+results_protein_interactions_MR_table <- ldply(results_protein_interactions_MR, data.table)
 
 ### Save the results - saving list and table format, 
 
-#pastefile1 <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.rdata")
-#save(results_protein_interactions_MR_table, file=pastefile1)
+pastefile1 <- paste0(results_location, "prot-a-", outcome_protein, "_MR_results.rdata")
+save(results_protein_interactions_MR_table, file=pastefile1)
 
 
 ########################

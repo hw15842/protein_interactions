@@ -644,6 +644,7 @@ unique_SNP_out_freq_table_under50_assocs <- subset(unique_SNP_out_freq_table, un
 SNP_gene_prot_assoc <- data.frame(SNP_gene_query[,2:5])
 
 SNP_gene_prot_assoc <- merge(SNP_gene_prot_assoc, unique_SNP_out_freq_table_over50_assocs, by.x = "name", by.y = "SNP")
+save(SNP_gene_prot_assoc, file="SNP_gene_prot_assoc.rdata")  ## the mass pleio SNPs and the genes they are associated with
 
 genes_outside_prot_interactions <- grep("SLC46A1|ABO|BCHE", SNP_gene_prot_assoc$geneinfo)
 
@@ -673,6 +674,7 @@ SNPs_manually_found_ABO <- subset(SNPs_not_in_gene_query, SNPs_not_in_gene_query
 SNPs_manually_found_ABO$geneinfo <- c("ABO:28")
 
 SNP_query_with_extra_ABO_snps <- rbind(SNPs_in_query, SNPs_manually_found_ABO)
+save(SNP_query_with_extra_ABO_snps, file="SNP_query_with_extra_ABO_snps.rdata")
 
 
 genes_outside_prot_interactions_ABO_snps_added <- grep("SLC46A1|ABO|BCHE", SNP_query_with_extra_ABO_snps$geneinfo)
@@ -933,7 +935,7 @@ names(which_studies_missing) <- c("SNP", "Freq")
 ##############
 
 
-prot_c_snp_list <- read.table("protc_snplist.txt", stringsAsCharacters=FALSE)$V1
+prot_c_snp_list <- read.table("/Users/hw15842/Documents/PhD_work/protein_interactions/Data/protc_snplist.txt")$V1
 
 protc_missing <- sapply(names(all_snps), function(x) {
   if(!"prot-c" %in% colnames(all_snps[[x]]))
@@ -963,6 +965,8 @@ tags <- bind_rows(tags)
 df <- lapply(tags$tag, all_snps_func)
 names(df) <- tags$target
 
+save(df, file="over_50_snps_in_other_studies_with_tagged_SNPs.rdata")
+
 # make percentages
 
 percent_func <- function(SNP){
@@ -983,7 +987,16 @@ percentages_taged_snps$tag_or_main <- "Tag"
 
 other_snps <- all_snps[names(all_snps) %in% all_three_study_SNPs$SNP]
 
-percentages_main_snps <- lapply(1:length(other_snps), percent_func)
+percent_func_other_snps <- function(SNP){
+  other_snps_percent <- data.frame(((other_snps[[SNP]][2]/(other_snps[[SNP]][1]+other_snps[[SNP]][2])))*100,
+                           ((other_snps[[SNP]][4]/(other_snps[[SNP]][3]+other_snps[[SNP]][4])))*100,
+                           ((other_snps[[SNP]][6]/(other_snps[[SNP]][5]+other_snps[[SNP]][6])))*100)
+  names(other_snps_percent) <- c("prot-a", "prot-b", "prot-c")
+  return(other_snps_percent)
+  
+}
+
+percentages_main_snps <- lapply(1:length(other_snps), percent_func_other_snps)
 names(percentages_main_snps) <- names(other_snps)
 percentages_main_snps <- bind_rows(percentages_main_snps, .id = "column_label")
 percentages_main_snps$tag_or_main <- "Main"
@@ -1006,8 +1019,9 @@ save(percentages_SNPs, file = "percentages_SNPs_across_studies.rdata")
 
 
 
-### 
-### choose independent SNPs ####
+################################
+### Choose independent SNPs ####
+################################
 
 all_pQTLs <- Zheng_pQTLs_with_file_names[c("SNP", "CHR_SNP", "POS_SNP", "Study")]
 all_pQTLs <- all_pQTLs[order(all_pQTLs$CHR_SNP, all_pQTLs$POS_SNP),]
@@ -1022,5 +1036,73 @@ rownames(over_50_with_study_sorted) <- NULL
 ### if there are two Sun ones with the same amount of associations then pick the SNP that is more in the middle of all the SNPs location wise
 
 independent_mass_pleio_snps <-  over_50_with_study_sorted[c(6,12,13,22,27,28,43,53,60,72),]   
+save(independent_mass_pleio_snps, file = "independent_mass_pleio_snps.rdata")
+
+
+#### Adding in the genes for each SNP ###
+
+indep_SNPs_with_genes <- merge(independent_mass_pleio_snps, SNP_query_with_extra_ABO_snps, by="SNP", all.x=T)
+indep_SNPs_with_genes <- subset(indep_SNPs_with_genes, select = -c(Freq.y, CHR_SNP.y, POS_SNP.y))
+names(indep_SNPs_with_genes)[2:4] <- c("Freq", "CHR_SNP", "POS_SNP")
+save(indep_SNPs_with_genes, file="indep_SNPs_with_genes.rdata")
+
+indep_SNPs_with_genes_and_percent <- merge(indep_SNPs_with_genes, percentages_SNPs, by.x="SNP", by.y="column_label", all.x=T)   ## Tag here means that the tag SNP was used in SUhre t look up the SNP, not that the SNP is a tagged SNP
+save(indep_SNPs_with_genes_and_percent, file="indep_SNPs_with_genes_and_percent.rdata")
+
+### Add the gene info and percentages for all mass pleio SNPs ###
+# doing this as not all the independent SNPs have percenatge data or gene info #
+
+mass_pleio_SNPs_with_genes <- merge(over_50_with_study, SNP_query_with_extra_ABO_snps, by="SNP", all.x=T)
+mass_pleio_SNPs_with_genes <- subset(mass_pleio_SNPs_with_genes, select = -c(Freq.y, CHR_SNP.y, POS_SNP.y))
+names(mass_pleio_SNPs_with_genes)[2:4] <- c("Freq", "CHR_SNP", "POS_SNP")
+save(mass_pleio_SNPs_with_genes, file="mass_pleio_SNPs_with_genes.rdata")
+
+mass_pleio_SNPs_with_genes_and_percent <- merge(mass_pleio_SNPs_with_genes, percentages_SNPs, by.x="SNP", by.y="column_label", all.x=T)   ## Tag here means that the tag SNP was used in SUhre t look up the SNP, not that the SNP is a tagged SNP
+save(mass_pleio_SNPs_with_genes_and_percent, file="mass_pleio_SNPs_with_genes_and_percent.rdata")
+
+mass_pleio_SNPs_with_genes_and_percent_sorted <- mass_pleio_SNPs_with_genes_and_percent[order(mass_pleio_SNPs_with_genes_and_percent$CHR_SNP, mass_pleio_SNPs_with_genes_and_percent$POS_SNP),]
+
+
+
+## The ABO snps seem to be the ones that are closest percentage wise between the three studies ###
+
+## PLot the data ###
+# three lines for each study percent, plot the independent SNPs gene next to it #
+# or plot difference between SUn and Suhre and gene closest to... #
+
+
+mass_pleio_SNPs_with_genes_and_percent_sorted$replicates <- ifelse(((mass_pleio_SNPs_with_genes_and_percent_sorted$`prot-a`) - (mass_pleio_SNPs_with_genes_and_percent_sorted$`prot-c`)) < 10,
+                                                                   "Yes", "No")
+
+
+indep_SNPs_with_genes_and_percent$replicates <- ifelse(((indep_SNPs_with_genes_and_percent$`prot-a`) - (indep_SNPs_with_genes_and_percent$`prot-c`)) < 10,
+                                                                   "Yes", "No")
+
+### might need to change indep snps based on closest genes as well ###
+
+
+mass_pleio_SNPs_with_genes_and_percent_sorted$difference <- mass_pleio_SNPs_with_genes_and_percent_sorted$`prot-a` - mass_pleio_SNPs_with_genes_and_percent_sorted$`prot-c`
+
+fit_percent_diff_vs_num_prot_assoc <- lm(difference ~ Freq, data=mass_pleio_SNPs_with_genes_and_percent_sorted)
+regression_plot_fit_percent_diff_vs_num_prot_assoc <- ggplotRegression(fit_percent_diff_vs_num_prot_assoc) 
+regression_plot_fit_percent_diff_vs_num_prot_assoc 
+
+
+library(ggrepel)
+
+row.names(mass_pleio_SNPs_with_genes_and_percent_sorted)<- NULL
+
+label <- c(6,12,13,17,20,29,31,38,49,54,57,64,69)
+
+mass_pleio_SNPs_with_genes_and_percent_sorted$label <- ifelse(row.names(mass_pleio_SNPs_with_genes_and_percent_sorted) %in% label, "YES", "NO")
+
+plot_precentdiff_vs_prot_assoc <- ggplot(data = mass_pleio_SNPs_with_genes_and_percent_sorted, aes(x=as.numeric(Freq), y =difference, 
+                                                                                                   color = as.factor(geneinfo),
+                                                                                                   shape = as.factor(Study))) +
+  geom_point(size = 3) + 
+  geom_text_repel(aes(label=ifelse(label=="YES", geneinfo, ""),hjust=0,vjust=0)) 
+
+plot_precentdiff_vs_prot_assoc
+
 
 
